@@ -38,6 +38,17 @@ return [
             'report' => false,
         ],
 
+        // Identity documents. Private, never web-served; streamed only through
+        // an authorized controller. Use an encrypted S3 bucket in production.
+        'kyc' => [
+            'driver' => 'local',
+            'root' => storage_path('app/kyc'),
+            'visibility' => 'private',
+            'serve' => false,
+            'throw' => true,
+            'report' => true,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

@@ -3,59 +3,66 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Rules\PhoneNumber;
+use App\Services\AuditService;
+use App\Support\Phone;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
+/**
+ * Country and date of birth are identity attributes tied to KYC and cannot be
+ * self-edited after registration; support can correct them on request.
+ */
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 {
+    public function __construct(private readonly AuditService $audit) {}
+
     /**
      * Validate and update the given user's profile information.
      *
-     * @param  array<string, string>  $input
+     * @param  array<string, mixed>  $input
      *
      * @throws ValidationException
      */
     public function update(User $user, array $input): void
     {
-        Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
+        if (isset($input['phone']) && is_string($input['phone'])) {
+            $input['phone'] = Phone::normalize($input['phone']);
+        }
 
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users')->ignore($user->id),
-            ],
+        Validator::make($input, [
+            'name' => ['required', 'string', 'min:3', 'max:255'],
+            'email' => ['required', 'string', 'email:rfc', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'phone' => ['required', 'string', new PhoneNumber, Rule::unique('users')->ignore($user->id)],
         ])->validateWithBag('updateProfileInformation');
 
-        if ($input['email'] !== $user->email &&
-            $user instanceof MustVerifyEmail) {
-            $this->updateVerifiedUser($user, $input);
-        } else {
-            $user->forceFill([
-                'name' => $input['name'],
-                'email' => $input['email'],
-            ])->save();
-        }
-    }
+        $emailChanged = $input['email'] !== $user->email;
+        $phoneChanged = $input['phone'] !== $user->phone;
 
-    /**
-     * Update the given verified user's profile information.
-     *
-     * @param  array<string, string>  $input
-     */
-    protected function updateVerifiedUser(User $user, array $input): void
-    {
         $user->forceFill([
             'name' => $input['name'],
             'email' => $input['email'],
-            'email_verified_at' => null,
-        ])->save();
+            'phone' => $input['phone'],
+        ]);
 
-        $user->sendEmailVerificationNotification();
+        if ($emailChanged) {
+            $user->email_verified_at = null;
+        }
+        if ($phoneChanged) {
+            $user->phone_verified_at = null;
+        }
+
+        if (! $user->isDirty()) {
+            return;
+        }
+
+        $this->audit->logChanges($emailChanged ? 'user.email_changed' : 'user.profile_updated', $user);
+        $user->save();
+
+        if ($emailChanged) {
+            $user->sendEmailVerificationNotification();
+        }
     }
 }

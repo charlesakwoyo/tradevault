@@ -9,6 +9,7 @@ trait PasswordValidationRules
 {
     /**
      * Get the validation rules used to validate passwords.
+     * Strength requirements are defined once in AppServiceProvider via Password::defaults().
      *
      * @return array<int, Rule|array<mixed>|string>
      */

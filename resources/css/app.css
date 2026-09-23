@@ -1,9 +1,85 @@
 @import 'tailwindcss';
+@plugin '@tailwindcss/forms';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
+@source '../../app/Support/Navigation.php';
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* TradeVault brand: deep ink navy + teal accent */
+    --color-ink-50: #f4f6fa;
+    --color-ink-100: #e6eaf2;
+    --color-ink-200: #c9d1e1;
+    --color-ink-300: #9eabc6;
+    --color-ink-400: #6b7ca3;
+    --color-ink-500: #4b5b82;
+    --color-ink-600: #384669;
+    --color-ink-700: #2b3654;
+    --color-ink-800: #1d2540;
+    --color-ink-900: #121829;
+    --color-ink-950: #0a0e1a;
+
+    --color-brand-50: #ecfdf8;
+    --color-brand-100: #cff9ec;
+    --color-brand-200: #a3f0da;
+    --color-brand-300: #69e1c5;
+    --color-brand-400: #33c9ab;
+    --color-brand-500: #12ad92;
+    --color-brand-600: #098c78;
+    --color-brand-700: #0b7062;
+    --color-brand-800: #0e5950;
+    --color-brand-900: #0f4a43;
+}
+
+@utility card {
+    @apply rounded-2xl border border-ink-100 bg-white shadow-sm;
+}
+
+@utility btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+@utility btn-primary {
+    @apply btn bg-brand-600 text-white hover:bg-brand-700;
+}
+
+@utility btn-secondary {
+    @apply btn border border-ink-200 bg-white text-ink-700 hover:bg-ink-50;
+}
+
+@utility btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700;
+}
+
+@utility form-label {
+    @apply mb-1.5 block text-sm font-medium text-ink-700;
+}
+
+@utility form-input {
+    @apply block w-full rounded-lg border-ink-200 text-sm text-ink-900 shadow-sm placeholder:text-ink-300 focus:border-brand-500 focus:ring-brand-500;
+}
+
+@utility form-error {
+    @apply mt-1.5 text-sm text-red-600;
+}
+
+@layer components {
+    .table-base {
+        @apply min-w-full divide-y divide-ink-100 text-sm;
+    }
+
+    .table-base th {
+        @apply px-4 py-3 text-left text-xs font-semibold tracking-wide text-ink-400 uppercase;
+    }
+
+    .table-base td {
+        @apply px-4 py-3 whitespace-nowrap text-ink-700;
+    }
+}
+
+[x-cloak] {
+    display: none !important;
 }

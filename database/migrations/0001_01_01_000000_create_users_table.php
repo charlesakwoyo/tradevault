@@ -13,12 +13,26 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid')->unique();
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('phone', 20)->unique();
+            $table->timestamp('phone_verified_at')->nullable();
+            $table->char('country', 2)->index();
+            $table->date('date_of_birth');
             $table->string('password');
+            $table->string('status', 20)->default('active')->index();
+            $table->timestamp('suspended_at')->nullable();
+            $table->string('suspension_reason')->nullable();
+            $table->timestamp('terms_accepted_at')->nullable();
+            $table->string('terms_version', 20)->nullable();
+            $table->timestamp('privacy_accepted_at')->nullable();
+            $table->timestamp('last_login_at')->nullable();
+            $table->string('last_login_ip', 45)->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

@@ -35,4 +35,38 @@ return [
         ],
     ],
 
+    'sms' => [
+        'driver' => env('SMS_DRIVER', 'log'),
+        'log_channel' => env('SMS_LOG_CHANNEL', 'stack'),
+    ],
+
+    // Safaricom Daraja (M-Pesa STK Push / B2C). Integrated in the payments phase.
+    'mpesa' => [
+        'environment' => env('MPESA_ENVIRONMENT', 'sandbox'),
+        'consumer_key' => env('MPESA_CONSUMER_KEY'),
+        'consumer_secret' => env('MPESA_CONSUMER_SECRET'),
+        'shortcode' => env('MPESA_SHORTCODE'),
+        'passkey' => env('MPESA_PASSKEY'),
+        'callback_url' => env('MPESA_CALLBACK_URL'),
+        'callback_secret' => env('MPESA_CALLBACK_SECRET'),
+    ],
+
+    'payment_provider' => [
+        'key' => env('PAYMENT_PROVIDER_KEY'),
+        'secret' => env('PAYMENT_PROVIDER_SECRET'),
+        'webhook_secret' => env('PAYMENT_PROVIDER_WEBHOOK_SECRET'),
+    ],
+
+    'market_data' => [
+        'driver' => env('MARKET_DATA_DRIVER', 'sandbox'),
+        'api_key' => env('MARKET_DATA_API_KEY'),
+    ],
+
+    'trading' => [
+        'driver' => env('TRADING_DRIVER', 'sandbox'),
+        'api_key' => env('TRADING_API_KEY'),
+        'api_secret' => env('TRADING_API_SECRET'),
+        'webhook_secret' => env('TRADING_WEBHOOK_SECRET'),
+    ],
+
 ];
