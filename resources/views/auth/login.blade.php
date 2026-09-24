@@ -1,6 +1,8 @@
 <x-layouts.guest :title="__('Sign in')">
     <x-slot:subtitle>{{ __('Welcome back. Sign in to your account.') }}</x-slot:subtitle>
 
+    @include('auth.partials.google-button')
+
     <form method="POST" action="{{ route('login.store') }}" class="space-y-5">
         @csrf
 

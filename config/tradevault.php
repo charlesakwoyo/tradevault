@@ -13,13 +13,6 @@
 
 return [
 
-    /*
-     | When true, the UI shows a persistent DEMO / SANDBOX banner and all
-     | market data is simulated. Must be false only once a licensed
-     | market-data / execution provider is configured.
-     */
-    'demo_mode' => env('PLATFORM_DEMO_MODE', true),
-
     'base_currency' => env('PLATFORM_BASE_CURRENCY', 'USD'),
 
     'currencies' => array_filter(explode(',', env('PLATFORM_CURRENCIES', 'USD,KES'))),

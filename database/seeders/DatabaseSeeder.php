@@ -12,9 +12,6 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(RolesAndPermissionsSeeder::class);
-
-        if (app()->environment('local')) {
-            $this->call(DemoDataSeeder::class);
-        }
+        $this->call(MarketSeeder::class);
     }
 }

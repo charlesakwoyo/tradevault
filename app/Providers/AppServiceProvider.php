@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
+use App\Services\MarketData\BinanceMarketDataProvider;
+use App\Services\MarketData\MarketDataProvider;
+use App\Services\MarketData\SandboxMarketDataProvider;
 use App\Services\Sms\LogSmsGateway;
 use App\Services\Sms\SmsGateway;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\DevCommands;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
@@ -24,6 +28,15 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(SmsGateway::class, fn () => match (config('services.sms.driver')) {
             'log' => new LogSmsGateway,
             default => throw new InvalidArgumentException('Unsupported SMS driver ['.config('services.sms.driver').'].'),
+        });
+
+        $this->app->bind(MarketDataProvider::class, fn () => match (config('services.market_data.driver')) {
+            'binance' => new BinanceMarketDataProvider(
+                config('services.market_data.binance.base_url'),
+                config('services.market_data.binance.quote_aliases', []),
+            ),
+            'sandbox' => new SandboxMarketDataProvider,
+            default => throw new InvalidArgumentException('Unsupported market data driver ['.config('services.market_data.driver').'].'),
         });
     }
 
@@ -51,5 +64,8 @@ class AppServiceProvider extends ServiceProvider
 
             return $this->app->isProduction() ? $rule->uncompromised() : $rule;
         });
+
+        // `composer run dev` also runs the scheduler so market prices keep refreshing locally.
+        DevCommands::artisan('schedule:work', 'scheduler');
     }
 }

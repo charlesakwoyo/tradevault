@@ -9,6 +9,3 @@
 - **Crypto-asset risk:** crypto-assets are highly volatile and may be lightly regulated in your jurisdiction.
 - **Currency risk:** returns may be affected by exchange-rate movements.
 - **Operational risk:** outages at the platform or its providers may delay orders or withdrawals.
-
-## Demo / sandbox mode
-When the platform displays a DEMO / SANDBOX banner, all prices are simulated and balances are not real money.

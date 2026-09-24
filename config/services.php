@@ -57,9 +57,24 @@ return [
         'webhook_secret' => env('PAYMENT_PROVIDER_WEBHOOK_SECRET'),
     ],
 
+    // "Sign in with Google" (Socialite). The button only shows once a client ID is set.
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
+    ],
+
     'market_data' => [
         'driver' => env('MARKET_DATA_DRIVER', 'sandbox'),
         'api_key' => env('MARKET_DATA_API_KEY'),
+        // Prices older than this are shown as delayed.
+        'stale_after_seconds' => (int) env('MARKET_DATA_STALE_AFTER_SECONDS', 300),
+        'binance' => [
+            // https://data-api.binance.vision serves the same public data where api.binance.com is geo-blocked.
+            'base_url' => env('BINANCE_BASE_URL', 'https://api.binance.com'),
+            // Binance quotes crypto in USDT (a USD stablecoin); USD markets read the USDT pairs.
+            'quote_aliases' => ['USD' => 'USDT'],
+        ],
     ],
 
     'trading' => [

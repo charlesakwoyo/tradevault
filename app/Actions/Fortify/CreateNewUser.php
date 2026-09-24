@@ -10,6 +10,7 @@ use App\Services\Wallet\WalletService;
 use App\Support\Phone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
@@ -29,6 +30,37 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
+        return $this->register($input, ['password' => $this->passwordRules()]);
+    }
+
+    /**
+     * Create a customer who signed up with Google. Google has verified the
+     * email, so it is marked verified; the account gets an unusable random
+     * password until the customer sets one via "Forgot password".
+     *
+     * @param  array<string, mixed>  $input  name, phone, country, date_of_birth, terms, privacy
+     *
+     * @throws ValidationException
+     */
+    public function createFromGoogle(array $input, string $email, string $googleId): User
+    {
+        $input['email'] = $email;
+        $input['password'] = Str::password(64);
+
+        $user = $this->register($input);
+        $user->forceFill(['google_id' => $googleId, 'email_verified_at' => now()])->save();
+
+        return $user;
+    }
+
+    /**
+     * @param  array<string, mixed>  $input
+     * @param  array<string, mixed>  $extraRules
+     *
+     * @throws ValidationException
+     */
+    private function register(array $input, array $extraRules = []): User
+    {
         if (! config('tradevault.registration.enabled')) {
             throw ValidationException::withMessages(['email' => __('Registration is currently closed.')]);
         }
@@ -45,9 +77,9 @@ class CreateNewUser implements CreatesNewUsers
             'phone' => ['required', 'string', new PhoneNumber, Rule::unique(User::class)],
             'country' => ['required', 'string', 'size:2', new AllowedCountry],
             'date_of_birth' => ['required', 'date', 'before_or_equal:'.now()->subYears($minimumAge)->toDateString(), 'after:1900-01-01'],
-            'password' => $this->passwordRules(),
             'terms' => ['accepted'],
             'privacy' => ['accepted'],
+            ...$extraRules,
         ], [
             'date_of_birth.before_or_equal' => __('You must be at least :age years old to register.', ['age' => $minimumAge]),
             'terms.accepted' => __('You must accept the Terms and Conditions and Risk Disclosure.'),

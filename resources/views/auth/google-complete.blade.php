@@ -1,22 +1,16 @@
-<x-layouts.guest :title="__('Create your account')" wide>
-    <x-slot:subtitle>{{ __('It takes a couple of minutes. You will verify your email and phone next.') }}</x-slot:subtitle>
+<x-layouts.guest :title="__('Finish creating your account')" wide>
+    <x-slot:subtitle>{{ __('You are signing up with Google as :email. We need a few more details that the platform requires by law.', ['email' => $pending['email']]) }}</x-slot:subtitle>
 
-    @include('auth.partials.google-button')
-
-    <form method="POST" action="{{ route('register.store') }}" class="grid grid-cols-1 gap-5 sm:grid-cols-2" x-data="{ password: '' }">
+    <form method="POST" action="{{ route('auth.google.complete.store') }}" class="grid grid-cols-1 gap-5 sm:grid-cols-2">
         @csrf
+
+        @error('email') <p class="form-error sm:col-span-2">{{ $message }}</p> @enderror
 
         <div class="sm:col-span-2">
             <label for="name" class="form-label">{{ __('Full legal name') }}</label>
-            <input id="name" name="name" type="text" value="{{ old('name') }}" required autofocus autocomplete="name" class="form-input">
+            <input id="name" name="name" type="text" value="{{ old('name', $pending['name']) }}" required autofocus autocomplete="name" class="form-input">
             <p class="mt-1 text-xs text-ink-400">{{ __('Must match your identity document for verification.') }}</p>
             @error('name') <p class="form-error">{{ $message }}</p> @enderror
-        </div>
-
-        <div>
-            <label for="email" class="form-label">{{ __('Email') }}</label>
-            <input id="email" name="email" type="email" value="{{ old('email') }}" required autocomplete="email" class="form-input">
-            @error('email') <p class="form-error">{{ $message }}</p> @enderror
         </div>
 
         <div>
@@ -36,29 +30,11 @@
             @error('country') <p class="form-error">{{ $message }}</p> @enderror
         </div>
 
-        <div>
+        <div class="sm:col-span-2">
             <label for="date_of_birth" class="form-label">{{ __('Date of birth') }}</label>
-            <input id="date_of_birth" name="date_of_birth" type="date" value="{{ old('date_of_birth') }}" required max="{{ now()->subYears(config('tradevault.registration.minimum_age'))->toDateString() }}" class="form-input">
+            <input id="date_of_birth" name="date_of_birth" type="date" value="{{ old('date_of_birth') }}" required max="{{ now()->subYears(config('tradevault.registration.minimum_age'))->toDateString() }}" class="form-input sm:w-1/2">
             @error('date_of_birth') <p class="form-error">{{ $message }}</p> @enderror
         </div>
-
-        <div>
-            <label for="password" class="form-label">{{ __('Password') }}</label>
-            <input id="password" name="password" type="password" x-model="password" required autocomplete="new-password" class="form-input">
-            @error('password') <p class="form-error">{{ $message }}</p> @enderror
-        </div>
-
-        <div>
-            <label for="password_confirmation" class="form-label">{{ __('Confirm password') }}</label>
-            <input id="password_confirmation" name="password_confirmation" type="password" required autocomplete="new-password" class="form-input">
-        </div>
-
-        <ul class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:col-span-2" aria-label="{{ __('Password requirements') }}">
-            <li :class="password.length >= 12 ? 'text-emerald-600' : 'text-ink-400'">{{ __('At least 12 characters') }}</li>
-            <li :class="/[a-z]/.test(password) && /[A-Z]/.test(password) ? 'text-emerald-600' : 'text-ink-400'">{{ __('Upper and lower case letters') }}</li>
-            <li :class="/\d/.test(password) ? 'text-emerald-600' : 'text-ink-400'">{{ __('At least one number') }}</li>
-            <li :class="/[^A-Za-z0-9]/.test(password) ? 'text-emerald-600' : 'text-ink-400'">{{ __('At least one symbol') }}</li>
-        </ul>
 
         <div class="space-y-3 rounded-xl bg-ink-50 p-4 sm:col-span-2">
             <label class="flex items-start gap-3 text-sm text-ink-700">
@@ -85,10 +61,6 @@
 
         <div class="sm:col-span-2">
             <button type="submit" class="btn-primary w-full">{{ __('Create account') }}</button>
-            <p class="mt-4 text-center text-sm text-ink-500">
-                {{ __('Already have an account?') }}
-                <a href="{{ route('login') }}" class="font-semibold text-brand-700 hover:text-brand-800">{{ __('Sign in') }}</a>
-            </p>
         </div>
     </form>
 </x-layouts.guest>

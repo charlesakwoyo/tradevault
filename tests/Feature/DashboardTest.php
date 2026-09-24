@@ -72,10 +72,3 @@ test('legal pages render and unknown ones 404', function () {
     $this->get(route('legal.show', 'nope'))->assertNotFound();
 });
 
-test('the demo banner is shown in sandbox mode', function () {
-    config(['tradevault.demo_mode' => true]);
-    $this->get('/')->assertSee('DEMO / SANDBOX');
-
-    config(['tradevault.demo_mode' => false]);
-    $this->get('/')->assertDontSee('DEMO / SANDBOX');
-});
