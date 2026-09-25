@@ -5,13 +5,14 @@ use App\Http\Controllers\Account\PhoneVerificationController;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Auth\GoogleLoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LegalController;
 use App\Http\Controllers\MarketController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Middleware\RequireTwoFactorForStaff;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome')->name('home');
+Route::get('/', HomeController::class)->name('home');
 Route::get('/legal/{document}', [LegalController::class, 'show'])->name('legal.show');
 
 Route::middleware(['guest', 'throttle:auth-forms'])->prefix('auth/google')->name('auth.google.')->group(function () {

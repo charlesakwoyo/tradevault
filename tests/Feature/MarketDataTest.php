@@ -93,3 +93,18 @@ test('old price history is pruned', function () {
 
     expect(MarketPrice::pluck('last')->all())->toBe(['2.00000000']);
 });
+
+test('the landing page shows live prices to guests', function () {
+    $btc = Market::factory()->crypto('BTC', 'Bitcoin')->create(['data_source' => 'binance']);
+
+    MarketPrice::unguarded(fn () => $btc->prices()->create([
+        'last' => '84279.49', 'open' => '86288', 'source' => 'binance', 'is_simulated' => false, 'recorded_at' => now(),
+    ]));
+
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('USD 84,279.49')
+        ->assertSee('-2.33%')
+        ->assertSee('Crypto markets listed')
+        ->assertSee('Coming soon');
+});
