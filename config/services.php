@@ -64,6 +64,12 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', '/auth/google/callback'),
     ],
 
+    // In-app AI assistant (Claude). The chat widget only shows once an API key is set.
+    'anthropic' => [
+        'api_key' => env('ANTHROPIC_API_KEY'),
+        'model' => env('ASSISTANT_MODEL', 'claude-opus-5'),
+    ],
+
     'market_data' => [
         'driver' => env('MARKET_DATA_DRIVER', 'sandbox'),
         'api_key' => env('MARKET_DATA_API_KEY'),

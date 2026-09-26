@@ -3,6 +3,7 @@
 use App\Http\Controllers\Account\AccountController;
 use App\Http\Controllers\Account\PhoneVerificationController;
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\AssistantController;
 use App\Http\Controllers\Auth\GoogleLoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
@@ -32,6 +33,14 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::post('/account/phone/verify', [PhoneVerificationController::class, 'update'])
         ->middleware('throttle:10,1')
         ->name('account.phone.verify');
+});
+
+/*
+ | Help assistant — customers and staff. Account tools are customer-only (see AssistantTools).
+ */
+Route::middleware(['auth', 'active', 'verified'])->group(function () {
+    Route::post('/assistant/messages', [AssistantController::class, 'store'])->middleware('throttle:assistant')->name('assistant.messages.store');
+    Route::delete('/assistant/messages', [AssistantController::class, 'destroy'])->name('assistant.messages.destroy');
 });
 
 /*

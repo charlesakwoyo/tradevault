@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use Anthropic\Client;
+use App\Services\Assistant\AssistantModel;
+use App\Services\Assistant\ClaudeAssistantModel;
 use App\Services\MarketData\BinanceMarketDataProvider;
 use App\Services\MarketData\MarketDataProvider;
 use App\Services\MarketData\SandboxMarketDataProvider;
@@ -30,6 +33,11 @@ class AppServiceProvider extends ServiceProvider
             default => throw new InvalidArgumentException('Unsupported SMS driver ['.config('services.sms.driver').'].'),
         });
 
+        $this->app->bind(AssistantModel::class, fn () => new ClaudeAssistantModel(
+            new Client(apiKey: (string) config('services.anthropic.api_key')),
+            (string) config('services.anthropic.model'),
+        ));
+
         $this->app->bind(MarketDataProvider::class, fn () => match (config('services.market_data.driver')) {
             'binance' => new BinanceMarketDataProvider(
                 config('services.market_data.binance.base_url'),
@@ -57,6 +65,12 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('api-auth', fn (Request $request) => [
             Limit::perMinute(5)->by(Str::lower((string) $request->input('email')).'|'.$request->ip()),
             Limit::perMinute(20)->by('api-auth-ip|'.$request->ip()),
+        ]);
+
+        // Each assistant message is a paid API call.
+        RateLimiter::for('assistant', fn (Request $request) => [
+            Limit::perMinute(10)->by('assistant|'.$request->user()?->id),
+            Limit::perDay(200)->by('assistant-day|'.$request->user()?->id),
         ]);
 
         Password::defaults(function () {

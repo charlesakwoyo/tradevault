@@ -105,5 +105,9 @@
             </nav>
         @endif
     </div>
+
+    @if (\App\Services\Assistant\TradeVaultAssistant::isConfigured())
+        <x-assistant-widget />
+    @endif
 </body>
 </html>
